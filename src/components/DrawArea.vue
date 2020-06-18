@@ -1,15 +1,7 @@
 <template>
   <div class="draw-area">
-    <svg v-for="boundingBox in boundingBoxes">
-      <rect
-        :x="boundingBox.sX"
-        :y="boundingBox.sY"
-        :width="boundingBox.eX - boundingBox.sX"
-        :height="boundingBox.eY - boundingBox.sY"
-        stroke="green"
-        stroke-width="3"
-        fill="none"
-      />
+    <svg @click="onClick">
+      <BoundingBox v-for="boundingBox in boundingBoxTypes" :boundingBoxType="boundingBox" />
     </svg>
   </div>
 </template>
@@ -17,17 +9,22 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import BoundingBox from '@/types/BoundingBox'
+import BoundingBoxType from '@/types/BoundingBoxType'
+import BoundingBox from '@/components/BoundingBox'
 
-@Component
+@Component({
+  components: {
+    BoundingBox
+  }
+})
 export default class DrawArea extends Vue{
 
-  private boundingBoxes: BoundingBox[] = [];
+  private boundingBoxTypes: BoundingBoxTypes[] = [];
 
 
   mounted() {
-    this.boundingBoxes.push(
-      new BoundingBox(1, 1, 100, 50)
+    this.boundingBoxTypes.push(
+      new BoundingBoxType(1, 1, 100, 50)
     )
   }
 
@@ -40,10 +37,16 @@ export default class DrawArea extends Vue{
     return 300;
   }
 
+  onClick(){
+    this.boundingBoxTypes.push(
+      new BoundingBoxType(100, 200, 200, 100)
+    )
+  }
+
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 svg {
   border: 1px black solid;
   width: 90vw;

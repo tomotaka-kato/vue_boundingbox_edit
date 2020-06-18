@@ -1,4 +1,4 @@
-export default class BoundingBox {
+export default class BoundingBoxType {
     public sX: number;
     public sY: number;
     public eX: number;
