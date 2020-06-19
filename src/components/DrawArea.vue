@@ -32,14 +32,14 @@ import BoundingBox from '@/components/BoundingBox'
 })
 export default class DrawArea extends Vue{
 
-  private boundingBoxTypes: BoundingBoxTypes[] = [];
+  private boundingBoxTypes: BoundingBoxType[] = [];
 
   private isCreatingBoundingBox: boolean = false;
 
-  private currentBoundingBox: BoudingBoxType;
+  private currentBoundingBox: BoundingBoxType = null;
 
-  private offsetX: number;
-  private offsetY: number;
+  private offsetX: number = 0;
+  private offsetY: number = 0;
   private beginDrag: boolean = false;
 
   mounted() {
@@ -49,7 +49,6 @@ export default class DrawArea extends Vue{
   }
 
   get svgWidth() {
-    const windowWidth = window.width;
     return 500;
   }
 
@@ -124,7 +123,7 @@ export default class DrawArea extends Vue{
     this.isCreatingBoundingBox = false;
   }
 
-  onMouseLeave(event: MouseEnvent) {
+  onMouseLeave(event: MouseEvent) {
     this.boundingBoxTypes.map(x => x.isSelected = false);
   }
 

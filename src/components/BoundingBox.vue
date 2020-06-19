@@ -49,12 +49,12 @@ export default class BoundingBox extends Vue{
     return Math.abs(this.boundingBoxType.eY - this.boundingBoxType.sY);
   }
 
-  onMouseClick(event: Event) {
+  onMouseClick(event: MouseEvent) {
     event.stopPropagation();
     if(this.onClick) this.onClick(this.boundingBoxType);
   }
 
-  mouseDownHandler(event: Event) {
+  mouseDownHandler(event: MouseEvent) {
     if(this.onMouseDown) this.onMouseDown(event, this.boundingBoxType);
   }
 
