@@ -8,6 +8,8 @@
     stroke-width="5"
     fill="none"
 
+    :style="styles"
+
     @click="onMouseClick"
     @mousedown="mouseDownHandler"
     />
@@ -16,7 +18,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import BoundingBoxType from '@/types/BoundingBoxType'
+import BoundingBoxType from '@/types/BoundingBoxType';
+import { BoundingBoxStatus } from '@/types/BoundingBoxStatus';
 
 @Component
 export default class BoundingBox extends Vue{
@@ -25,9 +28,13 @@ export default class BoundingBox extends Vue{
   @Prop( ) private onClick?         : (boundingBox : BoundingBoxType                           ) => void;
   @Prop( ) private onMouseDown?     : (event       : MouseEvent, boundingBox : BoundingBoxType ) => void;
 
-  private isSelected: boolean = false;
-
-  mounted() {
+  private get styles(): object {
+    switch(this.boundingBoxType.isSelected) {
+      case BoundingBoxStatus.NotSelected:
+        return { 'cursor': 'pointer'}
+      case BoundingBoxStatus.Selected:
+        return { 'cursor': 'move' }
+    }
   }
 
   private get x() {
@@ -63,5 +70,4 @@ export default class BoundingBox extends Vue{
 
 
 <style lang="scss" scoped>
-
 </style>

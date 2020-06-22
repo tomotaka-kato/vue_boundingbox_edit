@@ -22,8 +22,9 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import BoundingBoxType from '@/types/BoundingBoxType'
-import BoundingBox from '@/components/BoundingBox'
+import BoundingBox from '@/components/BoundingBox.vue';
+import BoundingBoxType from '@/types/BoundingBoxType';
+import { BoundingBoxStatus } from '@/types/BoundingBoxStatus';
 
 @Component({
   components: {
@@ -63,30 +64,19 @@ export default class DrawArea extends Vue{
   onBoundingBoxMouseDown(event: MouseEvent, boundingBox: BoundingBoxType) {
     this.beginDrag = true;
     this.currentBoundingBox = boundingBox;
+    this.currentBoundingBox.isSelected = BoundingBoxStatus.Selected;
     const {x, y} = this.computeMousePosition(event);
     this.offsetX = x;
     this.offsetY = y;
   }
-
-  // onBoundingBoxMove(event: MouseEvent) {
-  //   if(!this.beginDrag) return;
-  //   event.stopPropagation();
-  //   const x = event.clientX;
-  //   const y = event.clientY;
-  //   // this.currentBoundingBox.updatePosition(x - offsetX, y - offsetY);
-  //   console.log('move')
-  // }
-
-  // onBoundingBoxDragEnd(event: MouseEvent) {
-  //   if(!this.beginDrag) return;
-  //   event.stopPropagation();
-  //   this.beginDrag = false;
-  // }
   
 
+  /**
+    * バウンディングボックス以外をクリックしたら選択状態を解除する。
+    */
   onClick(event: MouseEvent) {
     this.currentBoundingBox = null;
-    this.boundingBoxTypes.map(x => x.isSelected = false);
+    this.boundingBoxTypes.map(x => x.isSelected = BoundingBoxStatus.NotSelected);
   }
 
   onMouseDown(event: MouseEvent) {
@@ -94,8 +84,6 @@ export default class DrawArea extends Vue{
 
     } else {
       // バウンディングボックスが選択状態なら、バウンディングボックスの作成は行わない
-      // if(this.boundingBoxTypes.filter(x => x.isSelected).length > 0) return;
-      // if(this.currentBoundingBox) return ;
 
       this.isCreatingBoundingBox = true ;
       const { x, y } = this.computeMousePosition(event);
@@ -124,7 +112,9 @@ export default class DrawArea extends Vue{
   }
 
   onMouseLeave(event: MouseEvent) {
-    this.boundingBoxTypes.map(x => x.isSelected = false);
+    this.beginDrag = false;
+    this.isCreatingBoundingBox = false;
+    // this.boundingBoxTypes.map(x => x.isSelected = BoundingBoxStatus.NotSelected);
   }
 
 

@@ -1,3 +1,5 @@
+import { BoundingBoxStatus} from '@/types/BoundingBoxStatus';
+
 export default class BoundingBoxType {
     public id: number;
 
@@ -7,7 +9,7 @@ export default class BoundingBoxType {
     public eX: number;
     public eY: number;
 
-    public isSelected: boolean = false;
+    public isSelected: BoundingBoxStatus = BoundingBoxStatus.NotSelected;
 
     constructor(sX: number, sY: number, eX: number, eY: number) {
         this.id = sX + sY + eX + eY;
