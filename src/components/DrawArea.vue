@@ -16,6 +16,8 @@
           :onMouseDown="onBoundingBoxMouseDown"
         />
     </svg>
+    <Button text = 'ボタン1' :onClick='onButton1Click' color='#FF05AA' />
+    <Button :text = 'button2Text'  />
   </div>
 </template>
 
@@ -25,10 +27,12 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import BoundingBox from '@/components/BoundingBox.vue';
 import BoundingBoxType from '@/types/BoundingBoxType';
 import { BoundingBoxStatus } from '@/types/BoundingBoxStatus';
+import Button from '@/components/Button'
 
 @Component({
   components: {
-    BoundingBox
+    BoundingBox,
+    Button
   }
 })
 export default class DrawArea extends Vue{
@@ -57,6 +61,14 @@ export default class DrawArea extends Vue{
     return 300;
   }
 
+  onButton1Click() {
+    alert('ボタン1がクリックされました。')
+  }
+
+  onButton2Click() {
+    alert('ボタン2がクリックされた気がします。')
+  }
+
   onBoundingBoxClick(boundingBox: BoundingBoxType) {
     this.currentBoundingBox = boundingBox;
   }
@@ -68,6 +80,10 @@ export default class DrawArea extends Vue{
     const {x, y} = this.computeMousePosition(event);
     this.offsetX = x;
     this.offsetY = y;
+  }
+
+  get button2Text() {
+    return 'Button Second'
   }
   
 
