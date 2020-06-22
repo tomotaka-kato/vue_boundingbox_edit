@@ -18,6 +18,19 @@
     </svg>
     <Button text = 'ボタン1' :onClick='onButton1Click' color='#FF05AA' />
     <Button :text = 'button2Text'  />
+
+    </br>
+      <input type="text" v-model="todoMessage">
+      <Button text = '保存' :onClick='save'  />
+      <Button text = '削除' :onClick='deleteCompletedItems'  />
+
+        <div v-for="item in todoItems">
+          <input type="checkbox" v-model="item.isComplete">
+          <s v-if="item.isComplete">
+            <label>{{item.message}}</label>
+          </s>
+          <label v-else>{{item.message}}</label>
+        </div>
   </div>
 </template>
 
@@ -28,6 +41,7 @@ import BoundingBox from '@/components/BoundingBox.vue';
 import BoundingBoxType from '@/types/BoundingBoxType';
 import { BoundingBoxStatus } from '@/types/BoundingBoxStatus';
 import Button from '@/components/Button'
+import TodoItem from '@/types/TodoItem';
 
 @Component({
   components: {
@@ -43,9 +57,22 @@ export default class DrawArea extends Vue{
 
   private currentBoundingBox: BoundingBoxType = null;
 
-  private offsetX: number = 0;
-  private offsetY: number = 0;
-  private beginDrag: boolean = false;
+  private offsetX   : number = 0;
+  private offsetY   : number = 0;
+  private beginDrag : boolean = false;
+
+
+  private todoMessage: string = '';
+  private todoItems: TodoItem[] = [];
+
+  save() {
+    this.todoItems.push(new TodoItem(this.todoMessage, this.todoMessage === 'complete'));
+    this.todoMessage = '';
+  }
+
+  deleteCompletedItems() {
+    this.todoItems = this.todoItems.filter(item => !item.isComplete);
+  }
 
   mounted() {
     this.boundingBoxTypes.push(
@@ -140,6 +167,7 @@ export default class DrawArea extends Vue{
     return { x: event.clientX - rect.left, y: event.clientY - rect.top };
   }
 
+
 }
 </script>
 
@@ -150,3 +178,5 @@ svg {
   height: 500px;
 }
 </style>
+
+
