@@ -19,12 +19,12 @@
     <Button text = 'ボタン1' :onClick='onButton1Click' color='#FF05AA' />
     <Button :text = 'button2Text'  />
 
-    </br>
+    <br />
       <input type="text" v-model="todoMessage">
       <Button text = '保存' :onClick='save'  />
       <Button text = '削除' :onClick='deleteCompletedItems'  />
 
-        <div v-for="item in todoItems">
+        <div v-for="(item, index) in todoItems" :key="index">
           <input type="checkbox" v-model="item.isComplete">
           <s v-if="item.isComplete">
             <label>{{item.message}}</label>
@@ -36,11 +36,11 @@
 
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import BoundingBox from '@/components/BoundingBox.vue';
 import BoundingBoxType from '@/types/BoundingBoxType';
 import { BoundingBoxStatus } from '@/types/BoundingBoxStatus';
-import Button from '@/components/Button'
+import Button from '@/components/Button.vue'
 import TodoItem from '@/types/TodoItem';
 
 @Component({
@@ -55,7 +55,7 @@ export default class DrawArea extends Vue{
 
   private isCreatingBoundingBox: boolean = false;
 
-  private currentBoundingBox: BoundingBoxType = null;
+  private currentBoundingBox: BoundingBoxType | null = null;
 
   private offsetX   : number = 0;
   private offsetY   : number = 0;
@@ -117,15 +117,13 @@ export default class DrawArea extends Vue{
   /**
     * バウンディングボックス以外をクリックしたら選択状態を解除する。
     */
-  onClick(event: MouseEvent) {
+  onClick() {
     this.currentBoundingBox = null;
     this.boundingBoxTypes.map(x => x.isSelected = BoundingBoxStatus.NotSelected);
   }
 
   onMouseDown(event: MouseEvent) {
-    if(this.beginDrag) {
-
-    } else {
+    if(!this.beginDrag) {
       // バウンディングボックスが選択状態なら、バウンディングボックスの作成は行わない
 
       this.isCreatingBoundingBox = true ;
@@ -136,6 +134,8 @@ export default class DrawArea extends Vue{
   }
 
   onMouseMove(event: MouseEvent) {
+    if(!this.currentBoundingBox) return;
+
     if(this.beginDrag) {
       const { x, y } = this.computeMousePosition(event);
       this.currentBoundingBox.updatePosition(x - this.offsetX, y - this.offsetY);
@@ -149,12 +149,12 @@ export default class DrawArea extends Vue{
 
   }
 
-  onMouseUp(event: MouseEvent) {
+  onMouseUp() {
     this.beginDrag = false;
     this.isCreatingBoundingBox = false;
   }
 
-  onMouseLeave(event: MouseEvent) {
+  onMouseLeave() {
     this.beginDrag = false;
     this.isCreatingBoundingBox = false;
     // this.boundingBoxTypes.map(x => x.isSelected = BoundingBoxStatus.NotSelected);
@@ -163,8 +163,11 @@ export default class DrawArea extends Vue{
 
   // svg上でのマウス座標の返却
   private computeMousePosition(event: MouseEvent): {x: number, y: number } {
-    const rect = this.$refs.svg.getBoundingClientRect();
-    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    const svg = <SVGElement>this.$refs.svg;
+    const rect = svg.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    return {x, y};
   }
 
 
