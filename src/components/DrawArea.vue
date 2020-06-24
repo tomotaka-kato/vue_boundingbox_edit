@@ -163,7 +163,7 @@ export default class DrawArea extends Vue{
 
   // svg上でのマウス座標の返却
   private computeMousePosition(event: MouseEvent): {x: number, y: number } {
-    const svg: any = this.$refs.svg;
+    const svg = this.$refs.svg as SVGElement;
     const rect = svg.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
