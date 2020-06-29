@@ -14,23 +14,11 @@
           :boundingBoxType="boundingBox"
           :onClick="onBoundingBoxClick"
           :onMouseDown="onBoundingBoxMouseDown"
+          :onCornerDown="onBoundingBoxCornerMouseDown"
         />
     </svg>
-    <Button text = 'ボタン1' :onClick='onButton1Click' color='#FF05AA' />
-    <Button :text = 'button2Text'  />
-
-    <br />
-      <input type="text" v-model="todoMessage">
-      <Button text = '保存' :onClick='save'  />
-      <Button text = '削除' :onClick='deleteCompletedItems'  />
-
-        <div v-for="(item, index) in todoItems" :key="index">
-          <input type="checkbox" v-model="item.isComplete">
-          <s v-if="item.isComplete">
-            <label>{{item.message}}</label>
-          </s>
-          <label v-else>{{item.message}}</label>
-        </div>
+    <br>
+    <Button text="削除" :onClick="onDeleteButton" />
   </div>
 </template>
 
@@ -38,15 +26,14 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import BoundingBox from '@/components/BoundingBox.vue';
+import Button from '@/components/Button.vue';
 import BoundingBoxType from '@/types/BoundingBoxType';
 import { BoundingBoxStatus } from '@/types/BoundingBoxStatus';
-import Button from '@/components/Button.vue'
-import TodoItem from '@/types/TodoItem';
 
 @Component({
   components: {
     BoundingBox,
-    Button
+    Button,
   }
 })
 export default class DrawArea extends Vue{
@@ -61,18 +48,10 @@ export default class DrawArea extends Vue{
   private offsetY   : number = 0;
   private beginDrag : boolean = false;
 
+  // 円
+  private beginScale = false;
+  private point ="";
 
-  private todoMessage: string = '';
-  private todoItems: TodoItem[] = [];
-
-  save() {
-    this.todoItems.push(new TodoItem(this.todoMessage, this.todoMessage === 'complete'));
-    this.todoMessage = '';
-  }
-
-  deleteCompletedItems() {
-    this.todoItems = this.todoItems.filter(item => !item.isComplete);
-  }
 
   mounted() {
     this.boundingBoxTypes.push(
@@ -80,27 +59,12 @@ export default class DrawArea extends Vue{
     )
   }
 
-  get svgWidth() {
-    return 500;
-  }
-
-  get svgHeight() {
-    return 300;
-  }
-
-  onButton1Click() {
-    alert('ボタン1がクリックされました。')
-  }
-
-  onButton2Click() {
-    alert('ボタン2がクリックされた気がします。')
-  }
-
   onBoundingBoxClick(boundingBox: BoundingBoxType) {
     this.currentBoundingBox = boundingBox;
   }
 
   onBoundingBoxMouseDown(event: MouseEvent, boundingBox: BoundingBoxType) {
+    this.boundingBoxTypes.forEach(x => x.isSelected = BoundingBoxStatus.NotSelected);
     this.beginDrag = true;
     this.currentBoundingBox = boundingBox;
     this.currentBoundingBox.isSelected = BoundingBoxStatus.Selected;
@@ -109,8 +73,9 @@ export default class DrawArea extends Vue{
     this.offsetY = y;
   }
 
-  get button2Text() {
-    return 'Button Second'
+  onBoundingBoxCornerMouseDown(event: MouseEvent, point: string) {
+    this.beginScale = true;
+    this.point = point;
   }
   
 
@@ -119,7 +84,7 @@ export default class DrawArea extends Vue{
     */
   onClick() {
     this.currentBoundingBox = null;
-    this.boundingBoxTypes.map(x => x.isSelected = BoundingBoxStatus.NotSelected);
+    this.boundingBoxTypes.forEach(x => x.isSelected = BoundingBoxStatus.NotSelected);
   }
 
   onMouseDown(event: MouseEvent) {
@@ -145,6 +110,26 @@ export default class DrawArea extends Vue{
       const { x, y } = this.computeMousePosition(event);
       this.currentBoundingBox.eX = x;
       this.currentBoundingBox.eY = y;
+    } else if (this.beginScale) {
+      const { x, y } = this.computeMousePosition(event);
+      switch(this.point) {
+        case "leftTop": 
+          this.currentBoundingBox.sX = x;
+          this.currentBoundingBox.sY = y;
+          break;
+        case "rightBottom":
+          this.currentBoundingBox.eX = x;
+          this.currentBoundingBox.eY = y;
+          break;
+        case "rightTop": 
+          this.currentBoundingBox.eX = x;
+          this.currentBoundingBox.sY = y;
+          break;
+        case "leftBottom":
+          this.currentBoundingBox.sX = x;
+          this.currentBoundingBox.eY = y;
+          break;
+      }
     }
 
   }
@@ -152,14 +137,22 @@ export default class DrawArea extends Vue{
   onMouseUp() {
     this.beginDrag = false;
     this.isCreatingBoundingBox = false;
+    this.beginScale = false;
+    this.point = "";
   }
 
   onMouseLeave() {
     this.beginDrag = false;
     this.isCreatingBoundingBox = false;
+    this.beginScale = false;
+    this.point = "";
     // this.boundingBoxTypes.map(x => x.isSelected = BoundingBoxStatus.NotSelected);
   }
 
+  // 削除ボタン押下（選択されているバウンディングボックスの削除）
+  onDeleteButton() {
+    this.boundingBoxTypes = this.boundingBoxTypes.filter(x => !x.isSelected)
+  }
 
   // svg上でのマウス座標の返却
   private computeMousePosition(event: MouseEvent): {x: number, y: number } {
