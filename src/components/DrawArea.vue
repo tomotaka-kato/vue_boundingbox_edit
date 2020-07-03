@@ -18,7 +18,7 @@
         />
     </svg>
     <br>
-    <Button text="削除" :onClick="onDeleteButton" />
+    <Button text="削除" :onClick="deleteBoundingBox" />
   </div>
 </template>
 
@@ -57,6 +57,15 @@ export default class DrawArea extends Vue{
     this.boundingBoxTypes.push(
       new BoundingBoxType(1, 1, 100, 50)
     )
+    window.addEventListener('keyup', (event) => this.keyupHandler(event))
+  }
+
+  keyupHandler(event: KeyboardEvent) {
+    console.log(event.keyCode)
+      if(event.keyCode === 46 || event.keyCode === 8) {
+        // delete key または backspace key でバウンディングボックスの削除を行う
+        this.deleteBoundingBox();
+      }
   }
 
   onBoundingBoxClick(boundingBox: BoundingBoxType) {
@@ -150,8 +159,12 @@ export default class DrawArea extends Vue{
   }
 
   // 削除ボタン押下（選択されているバウンディングボックスの削除）
-  onDeleteButton() {
+  deleteBoundingBox() {
     this.boundingBoxTypes = this.boundingBoxTypes.filter(x => !x.isSelected)
+  }
+
+  keypress() {
+    console.log('press')
   }
 
   // svg上でのマウス座標の返却
