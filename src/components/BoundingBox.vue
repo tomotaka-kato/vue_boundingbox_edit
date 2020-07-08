@@ -7,7 +7,7 @@
       :height="height"
       stroke="green"
       stroke-width="5"
-      fill="none"
+      fill-opacity="0"
       :style="styles"
       @click="onMouseClick"
       @mousedown="mouseDownHandler"
@@ -30,12 +30,15 @@ export default class BoundingBox extends Vue{
   @Prop( ) private onClick?         : (boundingBox : BoundingBoxType                           ) => void;
   @Prop( ) private onMouseDown?     : (event       : MouseEvent, boundingBox : BoundingBoxType ) => void;
   @Prop( ) private onCornerDown?    : (event       : MouseEvent, point : string ) => void;
+
   private get styles(): object {
     switch(this.boundingBoxType.isSelected) {
       case BoundingBoxStatus.NotSelected:
         return { 'cursor': 'pointer'}
       case BoundingBoxStatus.Selected:
         return { 'cursor': 'move' }
+      default:
+        return {}
     }
   }
   private get x() {
